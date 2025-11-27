@@ -1,0 +1,850 @@
+{
+  "name": "4 Answers Upload and Grading",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "submit-answers",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        160
+      ],
+      "id": "ae9ed79d-b849-497a-8f00-a677f1849e75",
+      "name": "Receive Answers",
+      "webhookId": "e7be4d6b-6007-4c11-bbf3-aea1d715b6f0"
+    },
+    {
+      "parameters": {
+        "content": "### WF 6\n### 1 Form submission\n### 2 Grader \n### 3 Notify HR\n\n",
+        "height": 128
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        0
+      ],
+      "typeVersion": 1,
+      "id": "81310c7b-dcc8-4682-b44d-66b450f4d90b",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1Zsld-pK9AhuhDd1TIgpYUitcWs01N9uOY4rKXT4nXuE",
+          "mode": "list",
+          "cachedResultName": "Job_DB",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Zsld-pK9AhuhDd1TIgpYUitcWs01N9uOY4rKXT4nXuE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Zsld-pK9AhuhDd1TIgpYUitcWs01N9uOY4rKXT4nXuE/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Job_ID",
+              "lookupValue": "={{ $('Receive Answers').item.json.body.job_id}}"
+            }
+          ]
+        },
+        "options": {
+          "returnFirstMatch": true
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        608,
+        160
+      ],
+      "id": "c1d4b3f7-0058-47d6-b14e-a349a7598b3b",
+      "name": "get Job Context",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "X4PSAsGhlEF2F0pB",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "builtInTools": {},
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.3,
+      "position": [
+        816,
+        368
+      ],
+      "id": "ca3d9a67-0018-43de-9214-34b574dd9e83",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "jE1CmDehtcO2vsMC",
+          "name": "OpenAi account 3"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"score\": \"90\",\n  \"summary\": \"\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        960,
+        368
+      ],
+      "id": "2f102449-bea4-49f8-8a97-842cb5690304",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1vHdNEqU8fHO7yMevrwv6JfSYcWOr5f8z0b53kmEt6eQ",
+          "mode": "list",
+          "cachedResultName": "Responses_DB",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1vHdNEqU8fHO7yMevrwv6JfSYcWOr5f8z0b53kmEt6eQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1vHdNEqU8fHO7yMevrwv6JfSYcWOr5f8z0b53kmEt6eQ/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Answer_5": "={{ $json.body.answer_5 }}",
+            "Answer_3": "={{ $json.body.answer_3 }}",
+            "Answer_4": "={{ $json.body.answer_4 }}",
+            "Answer_2": "={{ $json.body.answer_2 }}",
+            "Answer_1": "={{ $json.body.answer_1 }}",
+            "Applicant_ID": "={{ $json.body.file_id }}",
+            "Job_ID": "={{ $json.body.job_id }}"
+          },
+          "matchingColumns": [
+            "Applicant_ID"
+          ],
+          "schema": [
+            {
+              "id": "Applicant_ID",
+              "displayName": "Applicant_ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Job_ID",
+              "displayName": "Job_ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Answer_1",
+              "displayName": "Answer_1",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Answer_2",
+              "displayName": "Answer_2",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Answer_3",
+              "displayName": "Answer_3",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Answer_4",
+              "displayName": "Answer_4",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Answer_5",
+              "displayName": "Answer_5",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Score",
+              "displayName": "Score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Reason",
+              "displayName": "Reason",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        192,
+        160
+      ],
+      "id": "fd14ae94-077b-4511-9670-62145d2f7a10",
+      "name": "Save Response",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "X4PSAsGhlEF2F0pB",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are a strict Technical Interviewer.\n\n### JOB CONTEXT\nRole: {{ $('get Job Context').item.json.Job_Title }}\nDescription: {{ $('get Job Context').item.json.Description }}\n\n### CANDIDATE SUBMISSION\nQ1 Answer: {{ $('Receive Answers').item.json.body.answer_1 }}\nQ2 Answer: {{ $('Receive Answers').item.json.body.answer_2 }}\nQ3 Answer: {{ $('Receive Answers').item.json.body.answer_3 }}\nQ4 Answer: {{ $('Receive Answers').item.json.body.answer_4 }}\nQ5 Answer: {{ $('Receive Answers').item.json.body.answer_5 }}\n\n### YOUR TASK\n1. Analyze if the answers demonstrate the specific skills required in the Description.\n2. Assign a \"score\" from 0 to 100.\n3. Write a \"summary\" (2 sentences) justifying the score.",
+        "hasOutputParser": true,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        816,
+        160
+      ],
+      "id": "afd4626c-78d8-45a0-bf3a-50d6eb853b31",
+      "name": "AI Grader"
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"UTF-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n  <title>Submission Successful</title>\n  <link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n  <link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n  <link href=\"https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap\" rel=\"stylesheet\">\n  <style>\n    /* Page Reset */\n    body {\n      margin: 0;\n      padding: 0;\n      font-family: 'Inter', sans-serif;\n      background-color: #f3f4f6; /* Light Gray Background */\n      display: flex;\n      align-items: center;\n      justify-content: center;\n      height: 100vh;\n    }\n\n    /* Card Container */\n    .success-card {\n      background: white;\n      width: 100%;\n      max-width: 480px;\n      padding: 50px 40px;\n      border-radius: 16px;\n      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);\n      text-align: center;\n      border-top: 6px solid #10b981; /* Success Green Line */\n    }\n\n    /* Icon Styling */\n    .icon-container {\n      width: 80px;\n      height: 80px;\n      background-color: #d1fae5; /* Light Green Circle */\n      border-radius: 50%;\n      display: flex;\n      align-items: center;\n      justify-content: center;\n      margin: 0 auto 25px auto;\n    }\n\n    .checkmark {\n      color: #059669; /* Dark Green Icon */\n      font-size: 40px;\n      line-height: 1;\n    }\n\n    /* Typography */\n    h1 {\n      color: #111827;\n      font-size: 28px;\n      font-weight: 700;\n      margin: 0 0 12px 0;\n    }\n\n    p {\n      color: #6b7280;\n      font-size: 16px;\n      line-height: 1.6;\n      margin-bottom: 30px;\n    }\n\n    /* Button Styling */\n    .btn {\n      display: inline-block;\n      background-color: #2563eb; /* KlarDataLabs Blue */\n      color: white;\n      font-weight: 600;\n      text-decoration: none;\n      padding: 14px 28px;\n      border-radius: 8px;\n      transition: background-color 0.2s ease;\n      width: 100%;\n      box-sizing: border-box;\n    }\n\n    .btn:hover {\n      background-color: #1d4ed8; /* Darker Blue on Hover */\n    }\n    \n    /* Mobile Tweaks */\n    @media (max-width: 600px) {\n      .success-card {\n        margin: 20px;\n        padding: 40px 20px;\n      }\n    }\n  </style>\n</head>\n<body>\n\n  <div class=\"success-card\">\n    <div class=\"icon-container\">\n      <div class=\"checkmark\">✓</div>\n    </div>\n    \n    <h1>Assessment Received!</h1>\n    \n    <p>\n      Thank you for completing the questionnaire. \n      Our recruitment team has been notified and will review your answers shortly.\n    </p>\n\n    <a href=\"https://klardatalabs.com\" class=\"btn\">Return to Homepage</a>\n  </div>\n\n</body>\n</html>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        400,
+        160
+      ],
+      "id": "621f435c-b95f-4c5a-9040-5bedcf886afc",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1vHdNEqU8fHO7yMevrwv6JfSYcWOr5f8z0b53kmEt6eQ",
+          "mode": "list",
+          "cachedResultName": "Responses_DB",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1vHdNEqU8fHO7yMevrwv6JfSYcWOr5f8z0b53kmEt6eQ/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1vHdNEqU8fHO7yMevrwv6JfSYcWOr5f8z0b53kmEt6eQ/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Applicant_ID": "={{ $('Save Response').item.json.Applicant_ID }}",
+            "Score": "={{ $('AI Grader').item.json.output.score }}",
+            "Reason": "={{ $('AI Grader').item.json.output.summary }}",
+            "Status": "Graded"
+          },
+          "matchingColumns": [
+            "Applicant_ID"
+          ],
+          "schema": [
+            {
+              "id": "Applicant_ID",
+              "displayName": "Applicant_ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Status",
+              "displayName": "Status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Applicant_Email",
+              "displayName": "Applicant_Email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Answer_5",
+              "displayName": "Answer_5",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Answer_1",
+              "displayName": "Answer_1",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Answer_2",
+              "displayName": "Answer_2",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Answer_3",
+              "displayName": "Answer_3",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Answer_4",
+              "displayName": "Answer_4",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "Score",
+              "displayName": "Score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Reason",
+              "displayName": "Reason",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1120,
+        160
+      ],
+      "id": "7fcf1cc4-6526-48e0-b1f2-f34694188f64",
+      "name": "Save Grades",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "X4PSAsGhlEF2F0pB",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "agentklar0@gmail.com",
+        "subject": "=Questionnaire Assessment: {{ $json.firstname }} {{ $json.lastname }}",
+        "message": "=<!DOCTYPE html> <html> <head> <style>   body { font-family: 'Helvetica', sans-serif; background-color: #f4f4f4; padding: 20px; }   .container { max-width: 600px; background: white; margin: 0 auto; padding: 30px; border-radius: 8px; border-top: 5px solid #2563eb; }   .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 20px; margin-bottom: 20px; }   .applicant-info h2 { margin: 0; color: #333; }   .role { color: #666; font-size: 14px; }      .score-box { text-align: center; background: #f0f9ff; padding: 10px 20px; border-radius: 8px; border: 1px solid #bae6fd; }   .score-val { font-size: 24px; font-weight: bold; color: #0284c7; display: block; }   .score-label { font-size: 11px; text-transform: uppercase; color: #0284c7; font-weight: bold; }    .summary { background-color: #ffffff; border-left: 4px solid #2563eb; padding: 15px; margin-bottom: 30px; color: #555; line-height: 1.5; }      .qa-section { margin-bottom: 30px; }   .qa-item { margin-bottom: 20px; border-bottom: 1px solid #f0f0f0; padding-bottom: 15px; }   .question { font-weight: bold; color: #111; margin-bottom: 5px; display: block; }   .answer { color: #444; white-space: pre-wrap; background: #fafafa; padding: 10px; border-radius: 4px; }    .action-btn { display: block; width: 100%; text-align: center; background-color: #10b981; color: white; padding: 15px 0; text-decoration: none; font-weight: bold; border-radius: 6px; font-size: 18px; }   .action-btn:hover { background-color: #059669; } </style> </head> <body>  <div class=\"container\">   <div class=\"header\">     <div class=\"applicant-info\">       <h2>{{ $('Receive Answers').item.json.body.email }}</h2>       <span class=\"role\">Applying for: {{ $('get Job Context').item.json.Job_Title }}</span>     </div>     <div class=\"score-box\">       <span class=\"score-val\">{{ $('AI Grader').item.json.output.score }}/100</span>       <span class=\"score-label\">AI Score</span>     </div>   </div>    <div class=\"summary\">     <strong>AI Assessment:</strong> {{ $('AI Grader').item.json.output.summary }}   </div>    <div class=\"qa-section\">          <div class=\"qa-item\">       <span class=\"question\">Q1: {{ $('get Job Context').item.json.Question_1 }}</span>       <div class=\"answer\">{{ $('Receive Answers').item.json.body.answer_1 }}</div>     </div>      <div class=\"qa-item\">       <span class=\"question\">Q2: {{ $('get Job Context').item.json.Question_2 }}</span>       <div class=\"answer\">{{ $('Receive Answers').item.json.body.answer_2 }}</div>     </div>      <div class=\"qa-item\">       <span class=\"question\">Q3: {{ $('get Job Context').item.json.Question_3 }}</span>       <div class=\"answer\">{{ $('Receive Answers').item.json.body.answer_3 }}</div>     </div>      <div class=\"qa-item\">       <span class=\"question\">Q4: {{ $('get Job Context').item.json.Question_4 }}</span>       <div class=\"answer\">{{ $('Receive Answers').item.json.body.answer_4 }}</div>     </div>      <div class=\"qa-item\">       <span class=\"question\">Q5: {{ $('get Job Context').item.json.Question_5 }}</span>       <div class=\"answer\">{{ $('Receive Answers').item.json.body.answer_5 }}</div>     </div>    </div>    <a href=\"https://vmi2913532.contaboserver.net/webhook/approve-interview?id={{ $('Receive Answers').item.json.body.file_id }}\" class=\"action-btn\">     ✅ Approve for Interview   </a>  </div>  </body> </html>",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1536,
+        160
+      ],
+      "id": "d15d68a8-ab1b-4eb1-8067-de24b503d99d",
+      "name": "Send a message",
+      "webhookId": "d4113101-0956-4205-80ef-600a75ee4467",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "QzLbIUeY4J9ePye2",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "path": "approve-interview",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        640
+      ],
+      "id": "b481fe8c-916e-4bf2-8aa6-f7b35b13c58a",
+      "name": "Webhook",
+      "webhookId": "b9534b2e-4295-4e8d-b8ff-d2a48242bc6f"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "12iZYBdiw76D5gmCWUpCFdv1GgmqxauUnJ4qLnRXHC-k",
+          "mode": "list",
+          "cachedResultName": "Applicant_DB",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/12iZYBdiw76D5gmCWUpCFdv1GgmqxauUnJ4qLnRXHC-k/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/12iZYBdiw76D5gmCWUpCFdv1GgmqxauUnJ4qLnRXHC-k/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "file_id": "={{ $json.query.id }}",
+            "status": "Interview"
+          },
+          "matchingColumns": [
+            "file_id"
+          ],
+          "schema": [
+            {
+              "id": "file_id",
+              "displayName": "file_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "firstname",
+              "displayName": "firstname",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "lastname",
+              "displayName": "lastname",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "job_id",
+              "displayName": "job_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "summary",
+              "displayName": "summary",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "score",
+              "displayName": "score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        208,
+        640
+      ],
+      "id": "201b5d20-dd6d-4bd3-8c25-a2fffe0714c8",
+      "name": "Update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "X4PSAsGhlEF2F0pB",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "text",
+        "responseBody": "<!DOCTYPE html>\n<html lang=\"en\">\n<head>\n  <meta charset=\"UTF-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n  <title>Interview Approved</title>\n  <link href=\"https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap\" rel=\"stylesheet\">\n  <style>\n    /* Global Reset */\n    body {\n      margin: 0;\n      padding: 0;\n      font-family: 'Inter', sans-serif;\n      background-color: #f3f4f6; /* Light Gray Background */\n      display: flex;\n      align-items: center;\n      justify-content: center;\n      height: 100vh;\n      color: #1f2937;\n    }\n\n    /* Card Container */\n    .card {\n      background: white;\n      width: 100%;\n      max-width: 420px;\n      padding: 40px;\n      border-radius: 12px;\n      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);\n      text-align: center;\n      border-top: 6px solid #2563eb; /* Tech Blue Accent */\n    }\n\n    /* Animated Success Icon */\n    .icon-circle {\n      width: 70px;\n      height: 70px;\n      background-color: #dbeafe; /* Light Blue Circle */\n      border-radius: 50%;\n      display: flex;\n      align-items: center;\n      justify-content: center;\n      margin: 0 auto 20px auto;\n    }\n\n    .checkmark {\n      color: #2563eb;\n      font-size: 36px;\n      font-weight: bold;\n    }\n\n    /* Typography */\n    h1 {\n      font-size: 24px;\n      font-weight: 700;\n      margin: 0 0 10px 0;\n      color: #111827;\n    }\n\n    p {\n      font-size: 16px;\n      color: #6b7280;\n      line-height: 1.5;\n      margin-bottom: 30px;\n    }\n\n    .status-badge {\n      display: inline-block;\n      background-color: #d1fae5;\n      color: #065f46;\n      padding: 4px 12px;\n      border-radius: 99px;\n      font-weight: 600;\n      font-size: 14px;\n      margin-bottom: 5px;\n    }\n\n    /* Button */\n    .btn {\n      display: inline-block;\n      width: 100%;\n      padding: 12px 0;\n      background-color: #1f2937; /* Dark Gray Button */\n      color: white;\n      text-decoration: none;\n      border-radius: 6px;\n      font-weight: 600;\n      transition: background-color 0.2s;\n      box-sizing: border-box;\n      cursor: pointer;\n    }\n\n    .btn:hover {\n      background-color: #111827;\n    }\n  </style>\n</head>\n<body>\n\n  <div class=\"card\">\n    <div class=\"icon-circle\">\n      <div class=\"checkmark\">✓</div>\n    </div>\n\n    <h1>Action Confirmed</h1>\n    \n    <p>\n      The candidate has been successfully approved.<br>\n      Database status updated to:\n    </p>\n\n    <div style=\"margin-bottom: 30px;\">\n      <span class=\"status-badge\">Interview</span>\n    </div>\n\n    <a href=\"javascript:window.close();\" class=\"btn\">Close Window</a>\n  </div>\n\n</body>\n</html>",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        416,
+        640
+      ],
+      "id": "25b6a54f-077c-46be-8d91-2ba0103ee70e",
+      "name": "Respond to Webhook1"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "12iZYBdiw76D5gmCWUpCFdv1GgmqxauUnJ4qLnRXHC-k",
+          "mode": "list",
+          "cachedResultName": "Applicant_DB",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/12iZYBdiw76D5gmCWUpCFdv1GgmqxauUnJ4qLnRXHC-k/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/12iZYBdiw76D5gmCWUpCFdv1GgmqxauUnJ4qLnRXHC-k/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "file_id",
+              "lookupValue": "={{ $('Save Response').item.json.Applicant_ID }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1328,
+        160
+      ],
+      "id": "28f2482b-cb24-4735-be81-96f99351d6f4",
+      "name": "Applicant info for Email",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "X4PSAsGhlEF2F0pB",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "Receives job_id, applicant_id and answers ",
+        "height": 80
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -16,
+        336
+      ],
+      "typeVersion": 1,
+      "id": "eca049b2-1cd4-460d-8b7a-b91c5ad594de",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "Receives japplicant_id ",
+        "height": 80
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        800
+      ],
+      "typeVersion": 1,
+      "id": "eeb93d08-3f7c-4046-920a-9182ddc60f5e",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "### WF 7\n### Status Update: Interview",
+        "height": 80
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        0,
+        528
+      ],
+      "typeVersion": 1,
+      "id": "95d34eb5-30f7-489c-8335-0efb8a0aa8ad",
+      "name": "Sticky Note3"
+    }
+  ],
+  "connections": {
+    "Receive Answers": {
+      "main": [
+        [
+          {
+            "node": "Save Response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get Job Context": {
+      "main": [
+        [
+          {
+            "node": "AI Grader",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Grader",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Grader",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Grader": {
+      "main": [
+        [
+          {
+            "node": "Save Grades",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save Response": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Respond to Webhook": {
+      "main": [
+        [
+          {
+            "node": "get Job Context",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Save Grades": {
+      "main": [
+        [
+          {
+            "node": "Applicant info for Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Applicant info for Email": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null
+}
